@@ -26,7 +26,7 @@ def activate():
             
             db = get_db()
             attempt = db.execute(
-                "SELECT *from activatelink where id=! and state=!", (number, utils.U_UNCONFIRMED)
+                "SELECT *from activatelink where id=? and state=?", (number, utils.U_UNCONFIRMED)
             ).fetchone()
 
             if attempt is not None:
@@ -61,12 +61,12 @@ def register():
             if not username:
                 error = 'Username is required.'
                 flash(error)
-                return render_template(TEMP)
+                return render_template()
             
             if not utils.isUsernameValid(username):
                 error = "Username should be alphanumeric plus '.','_','-'"
                 flash(error)
-                return render_template(TEMP)
+                return render_template('auth/register.html')
 
             if not password:
                 error = 'Password is required.'
@@ -76,7 +76,7 @@ def register():
             if db.execute(QUERY, (username,)).fetchone() is not None:
                 error = 'User {} is already registered.'.format(username)
                 flash(error)
-                return render_template(TEMP)
+                return render_template('auth/register.html')
             
             if ((not email) or (not utils.isEmailValid(email))):
                 error =  'Email address invalid.'
@@ -86,7 +86,7 @@ def register():
             if db.execute('SELECT id FROM user WHERE email = ?', (email,)).fetchone() is not None:
                 error =  'Email {} is already registered.'.format(email)
                 flash(error)
-                return render_template(TEMP)
+                return render_template('auth/register.html')
             
             if (not utils.isPasswordValid(password)):
                 error = 'Password should contain at least a lowercase letter, an uppercase letter and a number with 8 characters long'
@@ -114,7 +114,7 @@ def register():
             flash('Please check in your registered email to activate your account')
             return render_template('auth/login.html') 
 
-        return render_template(TEMP) 
+        return render_template('auth/register.html') 
     except:
         return render_template('auth/register.html')
 
@@ -140,11 +140,11 @@ def confirm():
 
             if not password1:
                 flash('Password confirmation required')
-                return render_template(TEMP, number=authid)
+                return render_template('auth/change.html', number=authid)
 
             if password1 != password:
                 flash('Both values should be the same')
-                return render_template(TEMP, number=authid)
+                return render_template('auth/change.html', number=authid)
 
             if not utils.isPasswordValid(password):
                 error = 'Password should contain at least a lowercase letter, an uppercase letter and a number with 8 characters long.'
